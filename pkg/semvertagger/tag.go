@@ -27,7 +27,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/remote/transport"
 )
 
-func Tag(refStr string, tags []string, opt ...Option) error {
+func Tag(refStr string, tags []string, versionLabelKey string, opt ...Option) error {
 
 	o := MakeOptions(opt...)
 	ref, err := name.ParseReference(refStr, o.name...)
@@ -35,7 +35,7 @@ func Tag(refStr string, tags []string, opt ...Option) error {
 		return fmt.Errorf("parsing reference %q: %v", refStr, err)
 	}
 
-	imageVersionStr, err := getVersion(ref, o.remote...)
+	imageVersionStr, err := getVersion(ref, versionLabelKey)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func Tag(refStr string, tags []string, opt ...Option) error {
 
 	for _, tag := range tags {
 		tagRef := ref.Context().Tag(tag)
-		tagVersionStr, err := getVersion(tagRef, o.remote...)
+		tagVersionStr, err := getVersion(tagRef, versionLabelKey, o.remote...)
 		if err != nil {
 			transportErr := errors.Unwrap(err)
 			if transportErr != nil {
@@ -87,7 +87,7 @@ func Tag(refStr string, tags []string, opt ...Option) error {
 			}
 			err := remote.Tag(tagRef, desc, o.remote...)
 			if err != nil {
-				log.Printf("tagging %q as %q: %v", ref, tagRef, err)
+				log.Printf("failed to tag %q as %q: %v", ref, tagRef, err)
 				continue
 			}
 			log.Printf("tagged %q as %q", ref.Identifier(), tagRef.Identifier())
@@ -99,8 +99,8 @@ func Tag(refStr string, tags []string, opt ...Option) error {
 	return nil
 }
 
-func getVersion(ref name.Reference, opt ...remote.Option) (string, error) {
-	img, err := remote.Image(ref, opt...)
+func getVersion(ref name.Reference, versionLabelKey string, options ...remote.Option) (string, error) {
+	img, err := remote.Image(ref, options...)
 	if err != nil {
 		return "", fmt.Errorf("reading image: %w", err)
 	}
@@ -110,7 +110,7 @@ func getVersion(ref name.Reference, opt ...remote.Option) (string, error) {
 		return "", fmt.Errorf("getting config file: %w", err)
 	}
 
-	version, found := config.Config.Labels["org.opencontainers.image.version"]
+	version, found := config.Config.Labels[versionLabelKey]
 	if !found {
 		return "", fmt.Errorf("no version found in image labels")
 	}

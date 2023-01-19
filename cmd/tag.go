@@ -25,7 +25,9 @@ func init() { Root.AddCommand(NewCmdTag(&options)) }
 
 // NewCmdTag creates a new cobra.Command for the tag subcommand.
 func NewCmdTag(options *[]semvertagger.Option) *cobra.Command {
-	return &cobra.Command{
+	var versionLabelKey string
+
+	cmd := &cobra.Command{
 		Use:   "tag IMAGE [TAG...]",
 		Short: "Tag a remote image if its version is greater than the version of the remote tag",
 		Args:  cobra.MinimumNArgs(1),
@@ -37,10 +39,16 @@ func NewCmdTag(options *[]semvertagger.Option) *cobra.Command {
 				tags = []string{"latest"}
 			}
 
-			err := semvertagger.Tag(ref, tags, *options...)
+			err := semvertagger.Tag(ref, tags, versionLabelKey, *options...)
 			if err != nil {
 				log.Fatal(err)
 			}
 		},
 	}
+
+	flags := cmd.Flags()
+
+	flags.StringVar(&versionLabelKey, "version-label", "org.opencontainers.image.version", "Specifies the image label containing the version.")
+
+	return cmd
 }
