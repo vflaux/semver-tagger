@@ -99,5 +99,9 @@ func login(opts loginOptions) error {
 		return err
 	}
 
-	return cf.Save()
+	if err := cf.Save(); err != nil {
+		return err
+	}
+	log.Printf("logged in via %s", cf.Filename)
+	return nil
 }
