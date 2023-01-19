@@ -15,7 +15,6 @@
 package semvertagger
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/google/go-containerregistry/pkg/authn"
@@ -54,13 +53,4 @@ func WithTransport(t http.RoundTripper) Option {
 // Insecure is an Option that allows image references to be fetched without TLS.
 func Insecure(o *Options) {
 	o.name = append(o.name, name.Insecure)
-}
-
-func ParseReference(r string, opt ...Option) (name.Reference, error) {
-	o := MakeOptions(opt...)
-	ref, err := name.ParseReference(r, o.name...)
-	if err != nil {
-		return nil, fmt.Errorf("parsing reference %q: %v", r, err)
-	}
-	return ref, nil
 }
