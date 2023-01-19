@@ -27,7 +27,6 @@ import (
 func init() {
 	Root.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable debug logs")
 	Root.PersistentFlags().BoolVar(&insecure, "insecure", false, "Allow image references to be fetched without TLS")
-	Root.PersistentFlags().Var(platform, "platform", "Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64).")
 }
 
 const commandName = "semver-tagger"
@@ -35,7 +34,6 @@ const commandName = "semver-tagger"
 var (
 	verbose  = false
 	insecure = false
-	platform = &platformValue{}
 
 	// Crane options for this invocation.
 	options = []semvertagger.Option{}
@@ -53,8 +51,6 @@ var (
 			if insecure {
 				options = append(options, semvertagger.Insecure)
 			}
-
-			options = append(options, semvertagger.WithPlatform(platform.platform))
 
 			// Add any http headers if they are set in the config file.
 			cf, err := config.Load(os.Getenv("DOCKER_CONFIG"))
