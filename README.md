@@ -1,7 +1,7 @@
 # TL;DR
 
 ```
-echo "${REGISTRY_PASSWORD}" | semver-tagger auth login --password-stdin "${REGISTRY_URL}" -u "${REGISTRY_USER}"
+echo "${REGISTRY_PASSWORD}" | semver-tagger login --password-stdin "${REGISTRY_URL}" -u "${REGISTRY_USER}"
 semver-tagger tag "${IMAGE}" latest '{{major}}' '{{major}}.{{minor}}'
 ```
 
@@ -37,20 +37,22 @@ No tag is changed because each tags versions are superior or equals to the versi
 # Usage
 
 ```
+semver-tagger is a tool to remotely tag an image if it is the latest version
+
 Usage:
   semver-tagger [flags]
   semver-tagger [command]
 
 Available Commands:
-  auth        Log in or access credentials
+  completion  Generate the autocompletion script for the specified shell
   help        Help about any command
+  login       Log in to a registry
   tag         Tag a remote image if its version is greater than the version of the remote tag
 
 Flags:
-  -h, --help                help for semver-tagger
-      --insecure            Allow image references to be fetched without TLS
-      --platform platform   Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64). (default all)
-  -v, --verbose             Enable debug logs
+  -h, --help       help for semver-tagger
+      --insecure   Allow image references to be fetched without TLS
+  -v, --verbose    Enable debug logs
 
 Use "semver-tagger [command] --help" for more information about a command.
 ```
@@ -64,12 +66,12 @@ Usage:
   semver-tagger tag IMAGE [TAG...] [flags]
 
 Flags:
-  -h, --help   help for tag
+  -h, --help                   help for tag
+      --version-label string   Specifies the image label containing the version. (default "org.opencontainers.image.version")
 
 Global Flags:
-      --insecure            Allow image references to be fetched without TLS
-      --platform platform   Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64). (default all)
-  -v, --verbose             Enable debug logs
+      --insecure   Allow image references to be fetched without TLS
+  -v, --verbose    Enable debug logs
 ```
 
 ### Templates
@@ -87,56 +89,13 @@ example:
 '{{major}}' '{{major}}.{{minor}}' '{{major}}.{{minor}}.{{patch}}'
 ```
 
-## Auth
+## Login
 
-```
-Log in or access credentials
-
-Usage:
-  semver-tagger auth [flags]
-  semver-tagger auth [command]
-
-Available Commands:
-  get         Implements a credential helper
-  login       Log in to a registry
-
-Flags:
-  -h, --help   help for auth
-
-Global Flags:
-      --insecure            Allow image references to be fetched without TLS
-      --platform platform   Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64). (default all)
-  -v, --verbose             Enable debug logs
-
-Use "semver-tagger auth [command] --help" for more information about a command.
-```
-
-### get
-```
-Implements a credential helper
-
-Usage:
-  semver-tagger auth get [flags]
-
-Examples:
-  # Read configured credentials for reg.example.com
-  echo "reg.example.com" | semver-tagger auth get
-  {"username":"AzureDiamond","password":"hunter2"}
-
-Flags:
-  -h, --help   help for get
-
-Global Flags:
-      --insecure            Allow image references to be fetched without TLS
-      --platform platform   Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64). (default all)
-  -v, --verbose             Enable debug logs
-```
-### login
 ```
 Log in to a registry
 
 Usage:
-  semver-tagger auth login [OPTIONS] [SERVER] [flags]
+  semver-tagger login [OPTIONS] [SERVER] [flags]
 
 Examples:
   # Log in to reg.example.com
@@ -149,8 +108,11 @@ Flags:
   -u, --username string   Username
 
 Global Flags:
-      --insecure            Allow image references to be fetched without TLS
-      --platform platform   Specifies the platform in the form os/arch[/variant] (e.g. linux/amd64). (default all)
-  -v, --verbose             Enable debug logs
+      --insecure   Allow image references to be fetched without TLS
+  -v, --verbose    Enable debug logs
 ```
 
+# Thanks
+
+This project was made thanks to https://github.com/google/go-containerregistry.
+This is kind of a stripped down version with an improved tag command.
