@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -29,57 +28,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() { Root.AddCommand(NewCmdAuth()) }
-
-// NewCmdAuth creates a new cobra.Command for the auth subcommand.
-func NewCmdAuth() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "auth",
-		Short: "Log in or access credentials",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			_ = cmd.Usage()
-		},
-	}
-	cmd.AddCommand(NewCmdAuthGet(), NewCmdAuthLogin())
-	return cmd
-}
-
-// NewCmdAuthGet creates a new `auth get` command.
-func NewCmdAuthGet() *cobra.Command {
-	return &cobra.Command{
-		Use:   "get",
-		Short: "Implements a credential helper",
-		Example: `  # Read configured credentials for reg.example.com
-  echo "reg.example.com" | ` + commandName + ` auth get
-  {"username":"AzureDiamond","password":"hunter2"}`,
-		Args: cobra.NoArgs,
-		Run: func(_ *cobra.Command, args []string) {
-			b, err := io.ReadAll(os.Stdin)
-			if err != nil {
-				log.Fatal(err)
-			}
-			reg, err := name.NewRegistry(strings.TrimSpace(string(b)))
-			if err != nil {
-				log.Fatal(err)
-			}
-			authorizer, err := authn.DefaultKeychain.Resolve(reg)
-			if err != nil {
-				log.Fatal(err)
-			}
-			auth, err := authorizer.Authorization()
-			if err != nil {
-				log.Fatal(err)
-			}
-			if err := json.NewEncoder(os.Stdout).Encode(auth); err != nil {
-				log.Fatal(err)
-			}
-		},
-	}
-}
+func init() { Root.AddCommand(NewCmdLogin()) }
 
 // NewCmdAuthLogin creates a new `crane auth login` command.
-func NewCmdAuthLogin() *cobra.Command {
+func NewCmdLogin() *cobra.Command {
 	var opts loginOptions
 
 	cmd := &cobra.Command{
