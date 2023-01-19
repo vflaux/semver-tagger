@@ -40,7 +40,7 @@ var (
 	// Crane options for this invocation.
 	options = []semvertagger.Option{}
 
-	// Root is the top-level cobra.Command for crane.
+	// Root is the top-level cobra.Command for semvertagger.
 	Root = &cobra.Command{
 		Use:               commandName,
 		Short:             commandName + " is a tool to remotely tag an image if it is the latest version",

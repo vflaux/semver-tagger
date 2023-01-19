@@ -21,10 +21,10 @@ import (
 	"github.com/vflaux/semver-tagger/pkg/semvertagger"
 )
 
-func init() { Root.AddCommand(NewCmdTag()) }
+func init() { Root.AddCommand(NewCmdTag(&options)) }
 
 // NewCmdTag creates a new cobra.Command for the tag subcommand.
-func NewCmdTag() *cobra.Command {
+func NewCmdTag(options *[]semvertagger.Option) *cobra.Command {
 	return &cobra.Command{
 		Use:   "tag IMAGE [TAG...]",
 		Short: "Tag a remote image if its version is greater than the version of the remote tag",
@@ -37,7 +37,7 @@ func NewCmdTag() *cobra.Command {
 				tags = []string{"latest"}
 			}
 
-			err := semvertagger.Tag(ref, tags)
+			err := semvertagger.Tag(ref, tags, *options...)
 			if err != nil {
 				log.Fatal(err)
 			}
