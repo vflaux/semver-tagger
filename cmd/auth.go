@@ -17,7 +17,7 @@ package cmd
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -55,7 +55,7 @@ func NewCmdAuthGet() *cobra.Command {
   {"username":"AzureDiamond","password":"hunter2"}`,
 		Args: cobra.NoArgs,
 		Run: func(_ *cobra.Command, args []string) {
-			b, err := ioutil.ReadAll(os.Stdin)
+			b, err := io.ReadAll(os.Stdin)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -120,7 +120,7 @@ type loginOptions struct {
 
 func login(opts loginOptions) error {
 	if opts.passwordStdin {
-		contents, err := ioutil.ReadAll(os.Stdin)
+		contents, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return err
 		}
