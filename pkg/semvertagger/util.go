@@ -15,19 +15,16 @@
 package semvertagger
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
-	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
 type Options struct {
-	name     []name.Option
-	remote   []remote.Option
-	platform *v1.Platform
+	name   []name.Option
+	remote []remote.Option
 }
 
 func MakeOptions(opts ...Option) Options {
@@ -56,23 +53,4 @@ func WithTransport(t http.RoundTripper) Option {
 // Insecure is an Option that allows image references to be fetched without TLS.
 func Insecure(o *Options) {
 	o.name = append(o.name, name.Insecure)
-}
-
-// WithPlatform is an Option to specify the platform.
-func WithPlatform(platform *v1.Platform) Option {
-	return func(o *Options) {
-		if platform != nil {
-			o.remote = append(o.remote, remote.WithPlatform(*platform))
-		}
-		o.platform = platform
-	}
-}
-
-func ParseReference(r string, opt ...Option) (name.Reference, error) {
-	o := MakeOptions(opt...)
-	ref, err := name.ParseReference(r, o.name...)
-	if err != nil {
-		return nil, fmt.Errorf("parsing reference %q: %v", r, err)
-	}
-	return ref, nil
 }
