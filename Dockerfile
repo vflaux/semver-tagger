@@ -1,26 +1,21 @@
-ARG ALPINE_VERSION=3.17
+# syntax=docker.io/docker/dockerfile:1.4
 
-FROM alpine:${ALPINE_VERSION}
-
-RUN apk add make --no-cache
-
+FROM scratch as base
 ARG TARGETOS
 ARG TARGETARCH
-
 COPY bin/semver-tagger_${TARGETOS}_${TARGETARCH} /usr/local/bin/semver-tagger
+ENTRYPOINT ["/usr/local/bin/semver-tagger"]
 
-ARG VENDOR
-ARG SOURCE
-ARG VERSION
-ARG REVISION
-ARG TITLE
-ARG CREATED
+FROM debian:bookworm-slim as debian
+ARG TARGETOS
+ARG TARGETARCH
+COPY --link bin/semver-tagger_${TARGETOS}_${TARGETARCH} /usr/local/bin/semver-tagger
 
-LABEL \
-    org.opencontainers.image.description="A tool to remotely tag an image if it is the latest version" \
-    org.opencontainers.image.vendor="$VENDOR" \
-    org.opencontainers.image.source="$SOURCE" \
-    org.opencontainers.image.version="$VERSION" \
-    org.opencontainers.image.revision="$REVISION" \
-    org.opencontainers.image.title="$TITLE" \
-    org.opencontainers.image.created="$CREATED"
+FROM debian as github-action
+COPY --link semver-tagger-action/entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+FROM alpine:3.17 as alpine
+ARG TARGETOS
+ARG TARGETARCH
+COPY --link bin/semver-tagger_${TARGETOS}_${TARGETARCH} /usr/local/bin/semver-tagger

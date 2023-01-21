@@ -18,96 +18,101 @@ jobs:
       GOOS: "${{matrix.os}}"
       GOARCH: "${{matrix.arch}}"
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - uses: vflaux/semver-tagger-action@v1
         with:
-          go-version: 1.19
+          image: vflaux/semver-tagger-action:0.1.0
+          
+  #     - uses: actions/checkout@v3
 
-      - name: Setup Golang caches
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{runner.os}}-golang-${{matrix.os}}_${{matrix.arch}}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{runner.os}}-golang-${{matrix.os}}_${{matrix.arch}}-
+  #     - name: Set up Go
+  #       uses: actions/setup-go@v3
+  #       with:
+  #         go-version: 1.19
 
-      - name: Vet
-        run: go vet -v ./...
+  #     - name: Setup Golang caches
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           ~/.cache/go-build
+  #           ~/go/pkg/mod
+  #         key: ${{runner.os}}-golang-${{matrix.os}}_${{matrix.arch}}-${{ hashFiles('**/go.sum') }}
+  #         restore-keys: |
+  #           ${{runner.os}}-golang-${{matrix.os}}_${{matrix.arch}}-
 
-      - name: Test
-        run: go test -v ./...
+  #     - name: Vet
+  #       run: go vet -v ./...
 
-      - name: Build
-        run: go build -v -o 'bin/semver-tagger_${{matrix.os}}_${{matrix.arch}}' main.go
+  #     - name: Test
+  #       run: go test -v ./...
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: bin
-          path: bin/
+  #     - name: Build
+  #       run: go build -v -o 'bin/semver-tagger_${{matrix.os}}_${{matrix.arch}}' main.go
 
-  publish-binaries:
-    name: Publish binaries to release
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    needs: build-binary
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: bin
-          path: bin
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: bin
+  #         path: bin/
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: bin/*
-          file_glob: true
-          overwrite: true
+  # publish-binaries:
+  #   name: Publish binaries to release
+  #   if: github.event_name == 'release'
+  #   runs-on: ubuntu-latest
+  #   needs: build-binary
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: bin
+  #         path: bin
 
-  build-and-push-image:
-    name: Build image and push to repository
-    runs-on: ubuntu-latest
-    needs: build-binary
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #     - name: Upload binaries to release
+  #       uses: svenstaro/upload-release-action@v2
+  #       with:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #         file: bin/*
+  #         file_glob: true
+  #         overwrite: true
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: bin
-          path: bin
+  # build-and-push-image:
+  #   name: Build image and push to repository
+  #   runs-on: ubuntu-latest
+  #   needs: build-binary
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/vflaux/semver-tagger
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=sha
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: bin
+  #         path: bin
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Docker meta
+  #       id: meta
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: ghcr.io/vflaux/semver-tagger
+  #         flavor: |
+  #           latest=false
+  #         tags: |
+  #           type=semver,pattern={{version}}
+  #           type=sha
+  #         labels: |
+  #           org.opencontainers.image.description=A tool to remotely tag an image if it is the latest version
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.repository_owner }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+
+  #     - name: Build image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         context: .
+  #         push: ${{ github.event_name != 'pull_request' }}
+  #         platforms: linux/amd64,linux/arm64
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
