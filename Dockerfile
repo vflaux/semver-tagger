@@ -7,7 +7,7 @@ RUN apk add make --no-cache
 ARG TARGETOS
 ARG TARGETARCH
 
-COPY bin/semver-tagger_${TARGETOS}_${TARGETARCH} /usr/local/bin/semver-tagger
+COPY --chmod=555 bin/semver-tagger_${TARGETOS}_${TARGETARCH} /usr/local/bin/semver-tagger
 
 ARG VENDOR
 ARG SOURCE
