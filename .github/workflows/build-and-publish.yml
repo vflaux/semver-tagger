@@ -10,13 +10,13 @@ jobs:
   build-binary:
     name: Build ${{matrix.os}}/${{matrix.arch}} binary
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: ["linux"]
-        arch: ["amd64", "arm64"]
-    env:
-      GOOS: "${{matrix.os}}"
-      GOARCH: "${{matrix.arch}}"
+    # strategy:
+    #   matrix:
+    #     os: ["linux"]
+    #     arch: ["amd64", "arm64"]
+    # env:
+    #   GOOS: "${{matrix.os}}"
+    #   GOARCH: "${{matrix.arch}}"
     steps:
       - uses: vflaux/semver-tagger-action@v1
         with:
