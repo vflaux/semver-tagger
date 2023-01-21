@@ -24,6 +24,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - run: ls $HOME
       - uses: vflaux/semver-tagger-action@v1
         with:
           image: ghcr.io/vflaux/semver-tagger-action:0.1.1
