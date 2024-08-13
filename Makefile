@@ -45,10 +45,10 @@ clean:
 
 image: build
 	docker build . \
-	  --build-arg VENDOR="${VENDOR}" \
-	  --build-arg SOURCE="${SOURCE}" \
+		--build-arg VENDOR="${VENDOR}" \
+		--build-arg SOURCE="${SOURCE}" \
 		--build-arg REVISION="${shell git rev-parse HEAD}" \
 		--build-arg VERSION="${IMAGE_VERSION}" \
 		--build-arg TITLE="${IMAGE_NAME}" \
 		--build-arg CREATED="$(date +%Y-%m-%dT%H:%M:%S%z)" \
-	  -t "${LOCAL_NAME}:${IMAGE_VERSION}"
+		-t "${LOCAL_NAME}:${IMAGE_VERSION}"
